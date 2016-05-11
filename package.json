@@ -8,7 +8,11 @@
   },
   "repository": {
     "type": "git",
+<<<<<<< HEAD
     "url": "https://github.com/arippley/multiplayer-browser-game"
+=======
+    "url": "https://github.com/allyrippley/multiplayer-browser-game"
+>>>>>>> ef4434e8f0099e2af70c475439d7437328bc7765
   },
   "keywords": [
     "react",
@@ -24,9 +28,15 @@
   "author": "A Rippley",
   "license": "MIT",
   "bugs": {
+<<<<<<< HEAD
     "url": "https://github.com/arippley/multiplayer-browser-game/issues"
   },
   "homepage": "https://github.com/arippley/multiplayer-browser-game",
+=======
+    "url": "https://github.com/allyrippley/multiplayer-browser-game/issues"
+  },
+  "homepage": "https://github.com/allyrippley/multiplayer-browser-game",
+>>>>>>> ef4434e8f0099e2af70c475439d7437328bc7765
   "devDependencies": {
     "babel-eslint": "^4.1.2",
     "babel-plugin-react-transform": "^2.0.0",
