@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
 
 var gameSchema = mongoose.Schema({
   name: { type: String, unique: true },
