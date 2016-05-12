@@ -2,7 +2,6 @@ import express from 'express'
 import path from 'path'
 
 import mongoose from 'mongoose'
-
 import { renderToString } from 'react-dom/server'
 import { Provider } from 'react-redux'
 import React from 'react'
@@ -17,9 +16,8 @@ import webpackConfig from '../../webpack.config.dev'
 const compiler = webpack(webpackConfig)
 import User from './models/User.js'
 import passport from 'passport'
+require('../../config/passport')(passport)
 
-// insert passport here in an es6 way
-// require('../../config/passport')(passport)
 import SocketIo from 'socket.io'
 const app = express()
 //set env vars
@@ -44,15 +42,38 @@ app.use(require('webpack-hot-middleware')(compiler))
 //load routers
 const messageRouter = express.Router()
 const usersRouter = express.Router()
-const channelRouter = express.Router()
+const gameRouter = express.Router()
 require('./routes/message_routes')(messageRouter)
-require('./routes/channel_routes')(channelRouter)
+require('./routes/game_routes')(gameRouter)
 require('./routes/user_routes')(usersRouter, passport)
 app.use('/api', messageRouter)
 app.use('/api', usersRouter)
-app.use('/api', channelRouter)
+app.use('/api', gameRouter)
 
 app.use('/', express.static(path.join(__dirname, '..', 'static')))
+
+function renderFullPage(html, initialState) {
+  return `
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        <title>Mobile Game</title>
+      </head>
+      <body>
+        <container id="react">${html}</container>
+        <script>
+          window.__INITIAL_STATE__ = ${JSON.stringify(initialState)}
+        </script>
+        <script src="/dist/bundle.js"></script>
+      </body>
+    </html>
+  `
+}
 
 app.get('/*', function(req, res) {
   const location = createLocation(req.url)
@@ -68,11 +89,6 @@ app.get('/*', function(req, res) {
       }
     }
     const store = configureStore(initialState)
-    // console.log(redirectLocation)
-    // if(redirectLocation) {
-    //   return res.status(302).end(redirectLocation)
-    // }
-
 
     if(err) {
       console.error(err)
@@ -107,26 +123,3 @@ const server = app.listen(process.env.PORT, 'localhost', function(err) {
 
 const chatIo = new SocketIo(server, {path: '/api/chat'})
 const socketEvents = require('./socketEvents')(chatIo)
-
-function renderFullPage(html, initialState) {
-  return `
-    <!doctype html>
-    <html lang="en">
-      <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
-        <link rel="icon" href="./favicon.ico" type="image/x-icon" />
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-        <title>Mobile Game</title>
-      </head>
-      <body>
-        <container id="react">${html}</container>
-        <script>
-          window.__INITIAL_STATE__ = ${JSON.stringify(initialState)}
-        </script>
-        <script src="/dist/bundle.js"></script>
-      </body>
-    </html>
-  `
-}
